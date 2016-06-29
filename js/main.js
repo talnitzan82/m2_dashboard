@@ -2,9 +2,10 @@ var MINUTES_INTERVAL = 1;
 var DEMANDS_WE_WANT = ["Total","Yume", "Tremor"];
 var baseRev = 0;
 var coun1terUpdateInterval;
+var revChart;
 function  startUpdatingCounters() {
     updateIntervalFunctions();
-    counterUpdateInterval = setInterval(updateIntervalFunctions, MINUTES_INTERVAL * 60 * 1000, this);
+    counterUpdateInterval = setInterval(updateIntervalFunctions, MINUTES_INTERVAL * 5 * 1000, this);
 }
 
 function updateIntervalFunctions() {
@@ -28,7 +29,8 @@ function updateIntervalFunctions() {
             console.log("back from server");
             var rev = calculateRev(data);
             if (baseRev == 0) {
-                addDemandsCounters(rev)
+                addDemandsCounters(rev);
+                revChart = new chart;
             } else {
                 console.log(rev);
                 console.log(minutesToQuery);
@@ -36,7 +38,12 @@ function updateIntervalFunctions() {
                 if (minutesToQuery == MINUTES_INTERVAL) timeToUpdate = 60;
                 for (var i = 0; i < counters.length; i++) {
                     counters[i].newValue = counters[i].value + rev[counters[i].name];
-                        counters[i].update(counters[i].newValue, timeToUpdate);
+                    counters[i].update(counters[i].newValue, timeToUpdate);
+                    if (counters[i].name == "Total") {
+                        var time  = myStartDate.getUTCHours()+myStartDate.getUTCMinutes();
+                        dps.push({ x: new Date(), y: rev[counters[i].name] });
+                        revChart.chart.render();
+                    }
                 }
             }
         });
